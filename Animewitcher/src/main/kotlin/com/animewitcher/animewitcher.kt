@@ -20,51 +20,28 @@ class AnimeWitcherProvider : MainAPI() {
     override val supportedTypes = setOf(TvType.Anime, TvType.AnimeMovie)
     override var lang = "ar"
     override val hasMainPage = true
-
-    // Load main page sections sequentially to prevent overloading connections
     override var sequentialMainPage = true
     override var sequentialMainPageDelay = 40L
-
-    // ── Main page categories (Browsing with Filters) ─────────────────────
-    // Format: "index|filterExpression"
-    // Available indices:
-    //   - "recent": Latest released episodes
-    //   - "series_fav_count_desc": Most popular anime
-    //   - "series_year_desc": Newest releases by year
-    //   - "series": Catalog with facet filters (state, type, year, season, studio, age, tags)
     override val mainPage = mainPageOf(
-        // General & Featured
         MainPageData("أحدث الحلقات",                         "recent|", true),
         MainPageData("الأكثر شعبية",                         "series_fav_count_desc|"),
         MainPageData("الأحدث إصداراً",                       "series_year_desc|"),
-
-        // Status
         MainPageData("أنمي مستمر (يعرض حالياً)",             "series|details.state:مستمر"),
         MainPageData("أنمي مكتمل",                           "series|details.state:مكتمل"),
         MainPageData("قريباً (لم يبدأ بثه بعد)",             "series|details.state:لم يتم بثه بعد"),
-
-        // Type
         MainPageData("أفلام أنمي",                           "series|type:فيلم"),
         MainPageData("أنمي أوفا (OVA)",                      "series|type:اوفا"),
-
-        // Seasons
         MainPageData("موسم خريف 2026",                       "series|details.season:خريف عام 2026"),
         MainPageData("موسم صيف 2026",                        "series|details.season:صيف عام 2026"),
         MainPageData("موسم ربيع 2026",                       "series|details.season:ربيع عام 2026"),
         MainPageData("موسم شتاء 2026",                       "series|details.season:شتاء عام 2026"),
-
-        // Years
         MainPageData("إصدارات سنة 2026",                     "series|details.year:2026"),
         MainPageData("إصدارات سنة 2025",                     "series|details.year:2025"),
         MainPageData("إصدارات سنة 2024",                     "series|details.year:2024"),
         MainPageData("إصدارات سنة 2023",                     "series|details.year:2023"),
-
-        // Age Ratings
         MainPageData("مناسب لجميع الأعمار",                  "series|details.age:\"لجميع الأعمار\""),
         MainPageData("تصنيف عمري +13",                       "series|details.age:+13"),
         MainPageData("تصنيف عمري +17",                       "series|details.age:+17"),
-
-        // Studios
         MainPageData("استوديو MAPPA",                        "series|details.studio:MAPPA"),
         MainPageData("استوديو Ufotable",                     "series|details.studio:ufotable"),
         MainPageData("استوديو Toei Animation",               "series|details.studio:\"Toei Animation\""),
@@ -75,8 +52,6 @@ class AnimeWitcherProvider : MainAPI() {
         MainPageData("استوديو Studio Pierrot",               "series|details.studio:\"Studio Pierrot\""),
         MainPageData("استوديو Kyoto Animation",              "series|details.studio:\"Kyoto Animation\""),
         MainPageData("استوديو CloverWorks",                  "series|details.studio:CloverWorks"),
-
-        // Genres & Tags
         MainPageData("تصنيف: أكشن",                          "series|tags:اكشن"),
         MainPageData("تصنيف: مغامرات",                       "series|tags:مغامرات"),
         MainPageData("تصنيف: كوميدي",                        "series|tags:كوميدي"),
@@ -98,7 +73,6 @@ class AnimeWitcherProvider : MainAPI() {
         MainPageData("تصنيف: نفسي",                          "series|tags:نفسي"),
         MainPageData("تصنيف: قتال ودموي",                    "series|tags:دموي")
     )
-    // ──────────────────────────────────────────────────────────────────
 
     @Volatile
     private var algoliaAppId = "QVHT7NPEJG"
@@ -231,12 +205,8 @@ class AnimeWitcherProvider : MainAPI() {
             logd("❌ [Firestore Keys] Failed to refresh keys. Error: ${e.message}")
         }
     }
-
-    // ── getMainPage: dispatches to recent or series index with filters ──
     override suspend fun getMainPage(page: Int, request: MainPageRequest): HomePageResponse = withContext(Dispatchers.IO) {
         val pageParam = (page - 1).coerceAtLeast(0)
-
-        // data format: "index|filterExpression"
         val parts = request.data.split("|", limit = 2)
         val indexName = parts.getOrElse(0) { "recent" }
         val filterExpr = parts.getOrElse(1) { "" }
@@ -254,8 +224,6 @@ class AnimeWitcherProvider : MainAPI() {
 
         return@withContext newHomePageResponse(request, list)
     }
-
-    // ── Algolia query helpers ─────────────────────────────────────────
 
     /** Query the "recent" index for latest episodes. */
     private suspend fun queryRecentIndex(page: Int): List<SearchResponse> {
@@ -328,10 +296,6 @@ class AnimeWitcherProvider : MainAPI() {
         }
         return results
     }
-
-    // ── Search with Filter Parsing ────────────────────────────────────
-    // Supports natural keywords and filter syntax:
-    // e.g. "One Piece year:1999" or "studio:mappa" or "tag:اكشن" or "state:مستمر"
     override suspend fun search(query: String): List<SearchResponse> = withContext(Dispatchers.IO) {
         val trimmed = query.trim()
         if (trimmed.isEmpty()) return@withContext emptyList()
@@ -355,8 +319,6 @@ class AnimeWitcherProvider : MainAPI() {
         val yearList = mutableListOf<String>()
         val studioList = mutableListOf<String>()
         val rawFilters = mutableListOf<String>()
-
-        // Also check if any hashtag #tag was in the text
         val hashTagRegex = Regex("""#([^\s]+)""")
         for (m in hashTagRegex.findAll(trimmed)) {
             val v = m.groupValues[1].replace("_", " ")
@@ -425,8 +387,6 @@ class AnimeWitcherProvider : MainAPI() {
                 }
             }
         }
-
-        // Build season filter expressions
         val seasonFilterList = mutableListOf<String>()
         if (seasonList.isNotEmpty()) {
             if (yearList.isNotEmpty()) {
@@ -442,8 +402,6 @@ class AnimeWitcherProvider : MainAPI() {
                 }
             }
         }
-
-        // Map year filters (if season didn't already consume them or standalone)
         val yearFilterList = yearList.map { "details.year:\"$it\"" }
 
         val categoryGroups = mutableListOf<String>()
@@ -478,8 +436,6 @@ class AnimeWitcherProvider : MainAPI() {
             query = textQuery
         )
     }
-
-    // ── load (anime detail page) ──────────────────────────────────────
     override suspend fun load(url: String): LoadResponse = withContext(Dispatchers.IO) {
         val totalStartTime = System.currentTimeMillis()
         logd("====== [LOAD] PROCESS STARTED ======")
@@ -539,8 +495,6 @@ class AnimeWitcherProvider : MainAPI() {
             this.tags = tags
         }
     }
-
-    // ── fetchEpisodes ─────────────────────────────────────────────────
     private suspend fun fetchEpisodes(animeId: String): List<EpisodeInfo> = withContext(Dispatchers.IO) {
         val startTime = System.currentTimeMillis()
         val encodedAnimeId = URLEncoder.encode(animeId, "utf-8").replace("+", "%20")
@@ -593,8 +547,6 @@ class AnimeWitcherProvider : MainAPI() {
 
     private fun firestoreDocUrl(path: String): String =
         "https://firestore.googleapis.com/v1/projects/$FIREBASE_PROJECT_ID/databases/(default)/documents/$path?key=$firebaseApiKey"
-
-    // ── fetchServersForEpisode ─────────────────────────────────────────
     private suspend fun fetchServersForEpisode(animeId: String, episodeId: String): List<ServerModel> = withContext(Dispatchers.IO) {
         val encodedAnimeId = URLEncoder.encode(animeId, "utf-8").replace("+", "%20")
         val encodedEpisodeId = URLEncoder.encode(episodeId, "utf-8").replace("+", "%20")
