@@ -2,7 +2,7 @@ version = 1
 
 cloudstream {
     description = ""
-    authors = listOf("Abodabodd")
+    authors = listOf("rinford09")
     language = "ar"
 
     status = 1
@@ -13,5 +13,5 @@ cloudstream {
         "AsianDrama"
     )
 
-    iconUrl = "https://raw.githubusercontent.com/Abodabodd/re-3arabi/refs/heads/main/5TV/icon.png"
+    iconUrl = "https://raw.githubusercontent.com/rinford09/re-3arabi/refs/heads/main/5TV/icon.png"
 }

@@ -14,7 +14,7 @@ import kotlinx.coroutines.withContext
 
 class Rate : MainAPI() {
 
-    override var mainUrl = "https://raw.githubusercontent.com/Abodabodd/re-3arabi/refs/heads/builds/plugins.json"
+    override var mainUrl = "https://raw.githubusercontent.com/rinford09/re-3arabi/refs/heads/builds/plugins.json"
     override var name = "تقييم الإضافات"
     override var lang = "ar"
 

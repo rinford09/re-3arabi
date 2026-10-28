@@ -52,13 +52,13 @@ subprojects {
     cloudstream {
         setRepo(
             System.getenv("GITHUB_REPOSITORY")
-                ?: "https://github.com/Abodabodd/re-3arabi/"
+                ?: "https://github.com/rinford09/re-3arabi/"
         )
-        authors = listOf("Abodabodd")
+        authors = listOf("rinford09")
     }
 
     android {
-        namespace = "com.Abodabodd"
+        namespace = "com.rinford09"
 
         defaultConfig {
             minSdk = 21

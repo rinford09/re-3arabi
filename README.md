@@ -14,10 +14,10 @@
 <h2>⬇️ انسخ الرابط والصقه في التطبيق أو اضغط على الصورة لتحميل الإضافات</h2>
 
 <p align="left">
-https://raw.githubusercontent.com/Abodabodd/re-3arabi/refs/heads/main/repo.json
+https://raw.githubusercontent.com/rinford09/re-3arabi/refs/heads/main/repo.json
 </p>
 <p align="left">
-<a href="https://abodabodd.github.io/testpage/">
+<a href="https://github.com/rinford09/re-3arabi">
 <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTbrCPMjoDiORDnpcSxcPa6g-7bWW31r6-BLQ&s" />
 </a>
 </p>

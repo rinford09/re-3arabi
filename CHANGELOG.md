@@ -5,6 +5,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [1.0.1] - 2026-10-28
+
+### Milestone: Author and Repository URLs Updated to rinford09
+* **Git Tag**: `v1.0.1`
+* **Repository**: [github.com/rinford09/re-3arabi](https://github.com/rinford09/re-3arabi)
+
+### Changed
+- Replaced all previous author entries across all 43 plugins with `rinford09`.
+- Updated root `build.gradle.kts` repository URL and plugin namespace to `rinford09`.
+- Updated `repo` and `repo.json` manifest URLs to `https://raw.githubusercontent.com/rinford09/re-3arabi/refs/heads/builds/plugins.json`.
+- Updated Rate and Faselhd plugin URLs to point to `rinford09/re-3arabi`.
+- Updated `README.md` with instructions and direct repo link.
+
+---
+
 ## [1.0.0] - 2026-10-28
 
 ### Milestone: AnimeWitcher Multi-Facet Filters & ADM Batch Download Fix
