@@ -20,8 +20,8 @@ class AnimeWitcherProvider : MainAPI() {
     override val supportedTypes = setOf(TvType.Anime, TvType.AnimeMovie)
     override var lang = "ar"
     override val hasMainPage = true
-    override var sequentialMainPage = true
-    override var sequentialMainPageDelay = 40L
+    override var sequentialMainPage = false
+    override var sequentialMainPageDelay = 0L
     override val mainPage = mainPageOf(
         MainPageData("أحدث الحلقات",                         "recent|", true),
         MainPageData("الأكثر شعبية",                         "series_fav_count_desc|"),
@@ -300,8 +300,9 @@ class AnimeWitcherProvider : MainAPI() {
         val trimmed = query.trim()
         if (trimmed.isEmpty()) return@withContext emptyList()
 
+        var searchIndex = "series"
         val tokenRegex = Regex(
-            """(?:tag|genre|تصنيف|studio|استوديو|year|سنة|عام|state|status|حالة|season|موسم|type|نوع|age|عمر|filters):(?:"([^"]+)"|([^\s]+))""",
+            """(?:tag|genre|تصنيف|studio|استوديو|year|سنة|عام|state|status|حالة|season|موسم|type|نوع|age|عمر|sort|order|ترتيب|filters):(?:"([^"]+)"|([^\s]+))""",
             RegexOption.IGNORE_CASE
         )
 
@@ -382,6 +383,12 @@ class AnimeWitcherProvider : MainAPI() {
                 "studio", "استوديو" -> {
                     studioList.add("details.studio:\"$rawVal\"")
                 }
+                "sort", "order", "ترتيب" -> {
+                    when (rawVal.lowercase()) {
+                        "popular", "popularity", "شعبية", "الأكثر شعبية", "الاكثر شعبية" -> searchIndex = "series_fav_count_desc"
+                        "year", "newest", "أحدث", "احدث", "الأحدث إصداراً", "الاحدث اصدارا" -> searchIndex = "series_year_desc"
+                    }
+                }
                 "filters" -> {
                     rawFilters.add(rawVal)
                 }
@@ -430,7 +437,7 @@ class AnimeWitcherProvider : MainAPI() {
         logd("🔍 [Search Filter] query='$textQuery', filters='$parsedFilterExpr'")
 
         return@withContext querySeriesIndex(
-            index = "series",
+            index = searchIndex,
             page = 0,
             filterExpr = parsedFilterExpr,
             query = textQuery
